@@ -41,5 +41,19 @@ model Document {
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
+  chunks DocumentChunk[]
+
   @@index([workspaceId])
+}
+
+model DocumentChunk {
+  id        String                       @id @default(cuid())
+  content   String                       @db.Text
+  embedding Unsupported("vector(384)")?
+  createdAt DateTime                     @default(now())
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
 }

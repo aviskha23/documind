@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { PDFParse } from "pdf-parse";
+import { chunkText } from "@/lib/chunk-text";
+import { generateEmbedding } from "@/lib/embeddings";
 
 export async function POST(request: Request) {
   try {
@@ -93,6 +95,24 @@ export async function POST(request: Request) {
         workspaceId: workspace.id,
       },
     });
+    const chunks = chunkText(rawText);
+
+    for (const content of chunks) {
+      const chunk = await prisma.documentChunk.create({
+        data: {
+          content,
+          documentId: document.id,
+        },
+      });
+
+      const embedding = await generateEmbedding(content);
+
+      await prisma.$executeRaw`
+        UPDATE "DocumentChunk"
+        SET embedding = ${JSON.stringify(embedding)}::vector
+        WHERE id = ${chunk.id}
+    `;
+    }
 
     return Response.json({
       message: "Document uploaded and text extracted successfully",
