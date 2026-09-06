@@ -34,6 +34,7 @@ model Document {
   id        String   @id @default(cuid())
   title     String
   fileUrl   String
+  rawText   String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

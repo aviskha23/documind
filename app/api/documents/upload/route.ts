@@ -1,10 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { PDFParse } from "pdf-parse";
 
 export async function POST(request: Request) {
   try {
-    // Check if the user is logged in
     const { userId } = await auth();
 
     if (!userId) {
@@ -14,7 +14,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get the uploaded file
     const formData = await request.formData();
     const file = formData.get("file");
 
@@ -25,7 +24,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Only allow PDF files
     if (file.type !== "application/pdf") {
       return Response.json(
         { error: "Only PDF files are allowed" },
@@ -33,7 +31,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find the user in our database
     const user = await prisma.user.findUnique({
       where: {
         clerkId: userId,
@@ -47,7 +44,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find the user's workspace
     const workspace = await prisma.workspace.findFirst({
       where: {
         ownerId: user.id,
@@ -61,13 +57,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create a unique file path
+    // Convert the uploaded file into a Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Extract text from the PDF
+    const parser = new PDFParse({ data: buffer });
+    const pdfData = await parser.getText();
+    const rawText = pdfData.text;
+
+    await parser.destroy();
+
+    // Store the PDF in Supabase Storage
     const filePath = `${user.id}/${Date.now()}-${file.name}`;
 
-    // Upload the PDF to Supabase Storage
     const { error: uploadError } = await supabaseAdmin.storage
-        .from("documents")
-        .upload(filePath, file);
+      .from("documents")
+      .upload(filePath, file);
 
     if (uploadError) {
       console.error("Supabase upload error:", uploadError);
@@ -78,17 +84,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save document information in our database
+    // Store the document and extracted text in PostgreSQL
     const document = await prisma.document.create({
       data: {
         title: file.name,
         fileUrl: filePath,
+        rawText,
         workspaceId: workspace.id,
       },
     });
 
     return Response.json({
-      message: "Document uploaded successfully",
+      message: "Document uploaded and text extracted successfully",
       document,
     });
   } catch (error) {
