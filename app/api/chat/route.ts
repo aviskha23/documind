@@ -1,5 +1,5 @@
 import { searchSimilarChunks } from "@/lib/search";
-import { generateAnswer } from "@/lib/ollama";
+import { streamAnswer } from "@/lib/ollama";
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +17,8 @@ export async function POST(request: Request) {
 
     if (chunks.length === 0) {
       return Response.json({
-        answer: "I couldn't find relevant information in your uploaded documents.",
+        answer:
+          "I couldn't find relevant information in your uploaded documents.",
         sources: [],
       });
     }
@@ -26,15 +27,108 @@ export async function POST(request: Request) {
       .map((chunk, index) => `[Source ${index + 1}]\n${chunk.content}`)
       .join("\n\n");
 
-    const answer = await generateAnswer(question, context);
+    const ollamaStream = await streamAnswer(question, context);
 
-    return Response.json({
-      answer,
-      sources: chunks.map((chunk) => ({
-        documentId: chunk.documentId,
-        content: chunk.content,
-        similarity: chunk.similarity,
-      })),
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = ollamaStream.getReader();
+
+        let buffer = "";
+
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+
+            if (done) break;
+
+            buffer += decoder.decode(value, {
+              stream: true,
+            });
+
+            const lines = buffer.split("\n");
+
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (!line.trim()) continue;
+
+              const data = JSON.parse(line);
+
+              if (data.message?.content) {
+                controller.enqueue(
+                  encoder.encode(
+                    JSON.stringify({
+                      type: "token",
+                      content: data.message.content,
+                    }) + "\n"
+                  )
+                );
+              }
+            }
+          }
+
+          if (buffer.trim()) {
+            const data = JSON.parse(buffer);
+
+            if (data.message?.content) {
+              controller.enqueue(
+                encoder.encode(
+                  JSON.stringify({
+                    type: "token",
+                    content: data.message.content,
+                  }) + "\n"
+                )
+              );
+            }
+          }
+
+          controller.enqueue(
+            encoder.encode(
+              JSON.stringify({
+                type: "sources",
+                sources: chunks.map((chunk) => ({
+                  documentId: chunk.documentId,
+                  content: chunk.content,
+                  similarity: chunk.similarity,
+                })),
+              }) + "\n"
+            )
+          );
+
+          controller.enqueue(
+            encoder.encode(
+              JSON.stringify({
+                type: "done",
+              }) + "\n"
+            )
+          );
+
+          controller.close();
+        } catch (error) {
+          console.error("Streaming error:", error);
+
+          controller.enqueue(
+            encoder.encode(
+              JSON.stringify({
+                type: "error",
+                error: "Something went wrong while generating the answer.",
+              }) + "\n"
+            )
+          );
+
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "application/x-ndjson",
+        "Cache-Control": "no-cache",
+      },
     });
   } catch (error) {
     console.error("Chat API error:", error);

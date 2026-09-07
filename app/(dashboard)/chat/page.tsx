@@ -34,6 +34,10 @@ export default function ChatPage() {
         role: "user",
         content: currentQuestion,
       },
+      {
+        role: "assistant",
+        content: "",
+      },
     ]);
 
     setLoading(true);
@@ -49,30 +53,91 @@ export default function ChatPage() {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.error || "Something went wrong");
       }
 
-      setMessages((previous) => [
-        ...previous,
-        {
-          role: "assistant",
-          content: data.answer,
-          sources: data.sources || [],
-        },
-      ]);
+      if (!response.body) {
+        throw new Error("No response body");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+
+        if (done) break;
+
+        buffer += decoder.decode(value, {
+          stream: true,
+        });
+
+        const lines = buffer.split("\n");
+
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+
+          const data = JSON.parse(line);
+
+          if (data.type === "token") {
+            setMessages((previous) => {
+              const updated = [...previous];
+              const lastMessage = updated[updated.length - 1];
+
+              if (lastMessage?.role === "assistant") {
+                updated[updated.length - 1] = {
+                  ...lastMessage,
+                  content: lastMessage.content + data.content,
+                };
+              }
+
+              return updated;
+            });
+          }
+
+          if (data.type === "sources") {
+            setMessages((previous) => {
+              const updated = [...previous];
+              const lastMessage = updated[updated.length - 1];
+
+              if (lastMessage?.role === "assistant") {
+                updated[updated.length - 1] = {
+                  ...lastMessage,
+                  sources: data.sources,
+                };
+              }
+
+              return updated;
+            });
+          }
+
+          if (data.type === "error") {
+            throw new Error(data.error);
+          }
+        }
+      }
     } catch (error) {
       console.error(error);
 
-      setMessages((previous) => [
-        ...previous,
-        {
-          role: "assistant",
-          content: "Something went wrong while getting the answer.",
-        },
-      ]);
+      setMessages((previous) => {
+        const updated = [...previous];
+        const lastMessage = updated[updated.length - 1];
+
+        if (lastMessage?.role === "assistant") {
+          updated[updated.length - 1] = {
+            ...lastMessage,
+            content: "Something went wrong while getting the answer.",
+          };
+        }
+
+        return updated;
+      });
     } finally {
       setLoading(false);
     }
@@ -105,10 +170,7 @@ export default function ChatPage() {
 
       <div className="mt-8 space-y-6">
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className="rounded-lg border p-6"
-          >
+          <div key={index} className="rounded-lg border p-6">
             <h3 className="font-semibold">
               {message.role === "user" ? "You" : "DocuMind"}
             </h3>
@@ -143,14 +205,6 @@ export default function ChatPage() {
               )}
           </div>
         ))}
-
-        {loading && (
-          <div className="rounded-lg border p-6">
-            <p className="text-muted-foreground">
-              Thinking...
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
