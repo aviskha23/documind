@@ -1,4 +1,4 @@
-# 🧠 DocuMind
+#  DocuMind
 
 **An AI-powered document knowledge base — upload PDFs, ask questions, get grounded answers.**
 
@@ -12,39 +12,27 @@ DocuMind is a full-stack Retrieval-Augmented Generation (RAG) application built 
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-**[Live Demo →](#)** *(add your Vercel URL here)*
+**[Live Demo →](#)** *(https://getdocumind.vercel.app)*
+
 
 ---
 
-## 📸 Screenshots
+##  Features
 
-*(add screenshots here — dashboard, chat with sources, dark mode toggle)*
-
-```
-docs/screenshots/
-├── dashboard.png
-├── chat.png
-└── dark-mode.png
-```
-
----
-
-## ✨ Features
-
-- 🔐 **Authentication** — secure sign-up/sign-in via Clerk, with automatic user & workspace provisioning
-- 📄 **PDF upload & processing** — drag-and-drop upload, text extraction, and storage
-- 🧩 **Smart chunking** — documents are split into overlapping chunks for better retrieval accuracy
-- 🧠 **Local embeddings** — runs `Xenova/all-MiniLM-L6-v2` on-device, no API cost for vectorization
-- 🔎 **Semantic search** — pgvector-powered similarity search finds the most relevant content for any question
-- 🤖 **Grounded AI answers** — responses are generated only from retrieved document context (no hallucinated answers)
-- 💬 **Streaming chat** — token-by-token streaming responses with cited sources
-- 🌗 **Light/dark mode** — full theme system with a custom pastel color palette
-- 🐳 **Dockerized** — fully containerized for consistent local and production environments
-- 💰 **$0 architecture** — every service used has a genuinely free tier; no credit card required anywhere
+-  **Authentication** — secure sign-up/sign-in via Clerk, with automatic user & workspace provisioning
+-  **PDF upload & processing** — drag-and-drop upload, text extraction, and storage
+-  **Smart chunking** — documents are split into overlapping chunks for better retrieval accuracy
+-  **Local embeddings** — runs `Xenova/all-MiniLM-L6-v2` on-device, no API cost for vectorization
+-  **Semantic search** — pgvector-powered similarity search finds the most relevant content for any question
+-  **Grounded AI answers** — responses are generated only from retrieved document context (no hallucinated answers)
+-  **Streaming chat** — token-by-token streaming responses with cited sources
+-  **Light/dark mode** — full theme system with a custom pastel color palette
+-  **Dockerized** — fully containerized for consistent local and production environments
+-  **$0 architecture** — every service used has a genuinely free tier; no credit card required anywhere
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
                         ┌──────────────┐
@@ -82,7 +70,7 @@ User Question → Query Embedding → pgvector Similarity Search →
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer | Technology | Purpose |
 |---|---|---|
@@ -103,7 +91,7 @@ User Question → Query Embedding → pgvector Similarity Search →
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -171,7 +159,7 @@ docker run -p 3000:3000 --env-file .env documind
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
 - [x] Authentication & workspace management
 - [x] PDF upload, storage, and text extraction
@@ -186,7 +174,7 @@ docker run -p 3000:3000 --env-file .env documind
 
 ---
 
-## 🧠 Design Decisions
+##  Design Decisions
 
 A few notable engineering choices worth highlighting:
 
@@ -197,12 +185,12 @@ A few notable engineering choices worth highlighting:
 
 ---
 
-## 📄 License
+##  License
 
 MIT
 
 ---
 
-## 🙋 About
+##  About
 
 Built as a full-stack learning project to explore RAG architecture, local AI inference, and production deployment — from database design through Docker and live deployment.
