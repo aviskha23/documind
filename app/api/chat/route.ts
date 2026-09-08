@@ -55,14 +55,33 @@ export async function POST(request: Request) {
             for (const line of lines) {
               if (!line.trim()) continue;
 
-              const data = JSON.parse(line);
+              // Groq/OpenAI-style SSE lines start with "data: "
+              let jsonLine = line;
+              if (line.startsWith("data: ")) {
+                jsonLine = line.slice(6);
+              }
 
-              if (data.message?.content) {
+              // Groq signals the end of the stream with a special non-JSON line
+              if (jsonLine.trim() === "[DONE]") {
+                continue;
+              }
+
+              const data = JSON.parse(jsonLine);
+
+              // Ollama format: { message: { content: "..." } }
+              const ollamaContent = data.message?.content;
+
+              // Groq/OpenAI format: { choices: [{ delta: { content: "..." } }] }
+              const groqContent = data.choices?.[0]?.delta?.content;
+
+              const content = ollamaContent || groqContent;
+
+              if (content) {
                 controller.enqueue(
                   encoder.encode(
                     JSON.stringify({
                       type: "token",
-                      content: data.message.content,
+                      content,
                     }) + "\n"
                   )
                 );
@@ -71,17 +90,27 @@ export async function POST(request: Request) {
           }
 
           if (buffer.trim()) {
-            const data = JSON.parse(buffer);
+            let jsonLine = buffer;
+            if (jsonLine.startsWith("data: ")) {
+              jsonLine = jsonLine.slice(6);
+            }
 
-            if (data.message?.content) {
-              controller.enqueue(
-                encoder.encode(
-                  JSON.stringify({
-                    type: "token",
-                    content: data.message.content,
-                  }) + "\n"
-                )
-              );
+            if (jsonLine.trim() !== "[DONE]") {
+              const data = JSON.parse(jsonLine);
+              const ollamaContent = data.message?.content;
+              const groqContent = data.choices?.[0]?.delta?.content;
+              const content = ollamaContent || groqContent;
+
+              if (content) {
+                controller.enqueue(
+                  encoder.encode(
+                    JSON.stringify({
+                      type: "token",
+                      content,
+                    }) + "\n"
+                  )
+                );
+              }
             }
           }
 
