@@ -109,9 +109,9 @@ export default function DocumentsPage() {
 
   return (
     <div className="p-8">
-      <h1 className="mb-6 text-2xl font-bold">Documents</h1>
+      <h1 className="mb-6 text-2xl font-bold font-heading">Documents</h1>
 
-      <Card className="max-w-md p-6">
+      <Card className="max-w-md p-6 animate-fade-in-up">
         <p className="mb-4 text-sm text-muted-foreground">
           Upload a PDF to your workspace.
         </p>
@@ -126,8 +126,16 @@ export default function DocumentsPage() {
         <Button
           onClick={handleUpload}
           disabled={!file || status === "uploading"}
+          className="relative overflow-hidden"
         >
-          {status === "uploading" ? "Uploading..." : "Upload"}
+          {status === "uploading" ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              Uploading...
+            </span>
+          ) : (
+            "Upload"
+          )}
         </Button>
 
         {status === "success" && (

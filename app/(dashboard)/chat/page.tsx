@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 type Source = {
@@ -145,7 +146,7 @@ export default function ChatPage() {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="text-3xl font-bold">Chat</h2>
+      <h2 className="text-3xl font-bold font-heading">Chat</h2>
 
       <p className="mt-2 text-muted-foreground">
         Ask questions about your documents here.
@@ -159,18 +160,14 @@ export default function ChatPage() {
           className="flex-1 rounded-md border bg-background px-4 py-2"
         />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
-        >
-          {loading ? "Thinking..." : "Send"}
-        </button>
+        <Button type="submit" disabled={loading}>
+  {loading ? "Thinking..." : "Send"}
+</Button>
       </form>
 
       <div className="mt-8 space-y-6">
         {messages.map((message, index) => (
-          <div key={index} className="rounded-lg border p-6">
+            <div key={index} className="rounded-lg border p-6 animate-fade-in-up">
             <h3 className="font-semibold">
               {message.role === "user" ? "You" : "DocuMind"}
             </h3>

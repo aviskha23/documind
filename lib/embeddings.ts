@@ -1,4 +1,6 @@
-import { pipeline } from "@huggingface/transformers";
+import { env, pipeline } from "@huggingface/transformers";
+
+env.cacheDir = "./.model-cache";
 
 let extractor: any = null;
 
