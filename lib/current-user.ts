@@ -20,22 +20,23 @@ export async function getCurrentUser() {
     return null;
   }
 
+  const name =
+    clerkUser.fullName ||
+    `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() ||
+    null;
+
   const user = await prisma.user.upsert({
     where: {
       clerkId: userId,
     },
     update: {
       email,
-      name: clerkUser.firstName
-        ? `${clerkUser.firstName} ${clerkUser.lastName ?? ""}`.trim()
-        : null,
+      name,
     },
     create: {
       clerkId: userId,
       email,
-      name: clerkUser.firstName
-        ? `${clerkUser.firstName} ${clerkUser.lastName ?? ""}`.trim()
-        : null,
+      name,
     },
   });
 
