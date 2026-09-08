@@ -1,13 +1,16 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { PDFParse } from "pdf-parse";
 import { chunkText } from "@/lib/chunk-text";
 import { generateEmbedding } from "@/lib/embeddings";
 
 export async function POST(request: Request) {
+  const supabaseAdmin = getSupabaseAdmin();
   try {
     const { userId } = await auth();
+
+    console.log("UPLOAD AUTH USER:", userId);
 
     if (!userId) {
       return Response.json(
