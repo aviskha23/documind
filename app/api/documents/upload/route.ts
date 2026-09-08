@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { CanvasFactory } from "pdf-parse/worker";
 import { PDFParse } from "pdf-parse";
 import { chunkText } from "@/lib/chunk-text";
 import { generateEmbedding } from "@/lib/embeddings";
@@ -67,7 +68,10 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Extract text from the PDF
-    const parser = new PDFParse({ data: buffer });
+    const parser = new PDFParse({
+      data: new Uint8Array(buffer),
+      CanvasFactory,
+    });
     const pdfData = await parser.getText();
     const rawText = pdfData.text;
 
