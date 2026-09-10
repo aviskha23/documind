@@ -10,7 +10,12 @@ export async function POST(request: Request) {
   try {
     const { userId } = await auth();
 
-    console.log("UPLOAD AUTH USER:", userId);
+    console.log("CLERK DEBUG:", {
+  userId,
+  secretKeyLoaded: !!process.env.CLERK_SECRET_KEY,
+  publishableKeyLoaded: !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  nodeEnv: process.env.NODE_ENV,
+});
 
     if (!userId) {
       return Response.json(
