@@ -1,8 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { CanvasFactory } from "pdf-parse/worker";
-import { PDFParse } from "pdf-parse";
+import { extractText } from "unpdf";
 import { chunkText } from "@/lib/chunk-text";
 import { generateEmbedding } from "@/lib/embeddings";
 
@@ -65,17 +64,11 @@ export async function POST(request: Request) {
 
     // Convert the uploaded file into a Buffer
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer = new Uint8Array(arrayBuffer);
 
-    // Extract text from the PDF
-    const parser = new PDFParse({
-      data: new Uint8Array(buffer),
-      CanvasFactory,
-    });
-    const pdfData = await parser.getText();
-    const rawText = pdfData.text;
+    const { text } = await extractText(buffer, { mergePages: true });
 
-    await parser.destroy();
+    const rawText = text;
 
     // Store the PDF in Supabase Storage
     const filePath = `${user.id}/${Date.now()}-${file.name}`;

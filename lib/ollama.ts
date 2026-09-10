@@ -11,8 +11,7 @@ function isProduction() {
   return process.env.NODE_ENV === "production";
 }
 
-console.log("GROQ KEY LOADED:", !!process.env.GROQ_API_KEY);
-console.log("GROQ URL:", GROQ_URL);
+
 
 export async function generateAnswer(
   question: string,
