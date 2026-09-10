@@ -1,15 +1,15 @@
-import { env, pipeline } from "@huggingface/transformers";
-
-env.cacheDir = "./.model-cache";
-
-let extractor: any = null;
-
 function isProduction() {
   return process.env.NODE_ENV === "production";
 }
 
+let extractor: any = null;
+
 async function getExtractor() {
   if (!extractor) {
+    const { env, pipeline } = await import("@huggingface/transformers");
+
+    env.cacheDir = "./.model-cache";
+
     extractor = await pipeline(
       "feature-extraction",
       "Xenova/all-MiniLM-L6-v2"
@@ -38,7 +38,7 @@ async function generateHuggingFaceEmbedding(text: string) {
   }
 
   const response = await fetch(
-  "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction",
+    "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction",
     {
       method: "POST",
       headers: {
