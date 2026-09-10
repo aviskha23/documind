@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Home, FileText, MessageSquare } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserButton } from "@clerk/nextjs";
 
 export default function DashboardLayout({
   children,
@@ -10,11 +11,21 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen">
       <aside className="w-64 bg-sidebar text-sidebar-foreground p-6">
-        <div className="mb-10 flex items-center justify-between">
-          <h1 className="text-2xl font-bold font-heading">DocuMind</h1>
-          <ThemeToggle />
+        <div className="mb-10">
+          {/* Logo + theme toggle */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold font-heading">DocuMind</h1>
+            <ThemeToggle />
+          </div>
+
+          {/* User account */}
+          <div className="mt-6 flex items-center justify-between rounded-lg border border-sidebar-border p-3">
+            <span className="text-sm font-medium">My Account</span>
+            <UserButton />
+          </div>
         </div>
 
+        {/* Navigation */}
         <nav className="space-y-1">
           <Link
             href="/"
@@ -42,7 +53,9 @@ export default function DashboardLayout({
         </nav>
       </aside>
 
-      <main className="flex-1 bg-background p-8">{children}</main>
+      <main className="flex-1 bg-background p-8">
+        {children}
+      </main>
     </div>
   );
 }
