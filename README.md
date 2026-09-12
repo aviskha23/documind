@@ -1,4 +1,4 @@
-# 🧠 DocuMind
+#  DocuMind
 
 **An AI-powered document knowledge base — upload PDFs, ask questions, get grounded answers.**
 
@@ -17,7 +17,7 @@ DocuMind is a full-stack Retrieval-Augmented Generation (RAG) application built 
 
 ---
 
-## 📸 Screenshots
+##  Screenshots
 
 ### Dashboard
 
@@ -32,25 +32,25 @@ DocuMind is a full-stack Retrieval-Augmented Generation (RAG) application built 
 ![DocuMind RAG Chat](docs/screenshots/chat.png)
 ---
 
-## ✨ Features
+##  Features
 
-- 🔐 **Authentication** — email/password sign-up and sign-in via Clerk, with automatic user & workspace provisioning on first login
-- 🛡️ **Route protection** — unauthenticated users are redirected to `/sign-in`; authenticated state is reflected via Clerk's `UserButton` in the UI
-- 📄 **PDF upload & processing** — upload, text extraction, and persistent storage
-- 🧩 **Smart chunking** — documents are split into overlapping chunks for better retrieval accuracy
-- 🧠 **Dual-provider embeddings** — local Transformers.js model in development, Hugging Face's hosted Inference API in production (same model, same 384-dimensional vector space, no schema differences between environments)
-- 🔎 **Semantic search** — pgvector-powered cosine similarity search retrieves the most relevant chunks for any question
-- 🤖 **Grounded AI answers** — responses are generated strictly from retrieved document context, with an explicit instruction to decline rather than fabricate when context is insufficient
-- ⚡ **Dual-provider LLM** — Ollama (`llama3.2:3b`) locally for free, fast iteration; Groq (`openai/gpt-oss-20b`) in production for free, fast hosted inference with no dependency on a local machine
-- 💬 **Streaming chat** — token-by-token streamed responses with cited source chunks
-- 🌗 **Light/dark mode** — custom pastel color system with a theme toggle, built on CSS custom properties
-- 🐳 **Dockerized** — fully containerized for consistent local and production-parity testing
-- ☁️ **Deployed on Vercel** — live, publicly accessible production deployment
-- 💰 **$0 architecture, dev and prod** — every service used (Neon, Supabase, Clerk, Groq, Hugging Face, Vercel) has a genuinely free tier; no credit card required anywhere in the stack
+-  **Authentication** — email/password sign-up and sign-in via Clerk, with automatic user & workspace provisioning on first login
+-  **Route protection** — unauthenticated users are redirected to `/sign-in`; authenticated state is reflected via Clerk's `UserButton` in the UI
+-  **PDF upload & processing** — upload, text extraction, and persistent storage
+-  **Smart chunking** — documents are split into overlapping chunks for better retrieval accuracy
+-  **Dual-provider embeddings** — local Transformers.js model in development, Hugging Face's hosted Inference API in production (same model, same 384-dimensional vector space, no schema differences between environments)
+-  **Semantic search** — pgvector-powered cosine similarity search retrieves the most relevant chunks for any question
+-  **Grounded AI answers** — responses are generated strictly from retrieved document context, with an explicit instruction to decline rather than fabricate when context is insufficient
+-  **Dual-provider LLM** — Ollama (`llama3.2:3b`) locally for free, fast iteration; Groq (`openai/gpt-oss-20b`) in production for free, fast hosted inference with no dependency on a local machine
+-  **Streaming chat** — token-by-token streamed responses with cited source chunks
+-  **Light/dark mode** — custom pastel color system with a theme toggle, built on CSS custom properties
+-  **Dockerized** — fully containerized for consistent local and production-parity testing
+-  **Deployed on Vercel** — live, publicly accessible production deployment
+-  **$0 architecture, dev and prod** — every service used (Neon, Supabase, Clerk, Groq, Hugging Face, Vercel) has a genuinely free tier; no credit card required anywhere in the stack
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
                         ┌──────────────┐
@@ -97,7 +97,7 @@ User Question → Query Embedding → pgvector Similarity Search →
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer | Technology | Purpose |
 |---|---|---|
@@ -119,7 +119,7 @@ User Question → Query Embedding → pgvector Similarity Search →
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -202,7 +202,7 @@ Deployed on Vercel, connected to the `main` branch. Vercel's build command is ov
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
 **Done:**
 - [x] Authentication & workspace management, with route protection
@@ -221,7 +221,7 @@ Deployed on Vercel, connected to the `main` branch. Vercel's build command is ov
 
 ---
 
-## 🧠 Design Decisions
+##  Design Decisions
 
 - **Local-first, hosted-fallback architecture**: rather than run every service identically in dev and prod, DocuMind uses whichever provider fits each environment's constraints — local models where possible (fast, free, no network dependency), hosted free-tier APIs where serverless limitations make local inference impractical.
 - **Swapped `pdf-parse` for `unpdf` in production**: `pdf-parse`'s canvas dependency relies on native bindings (`DOMMatrix`, `@napi-rs/canvas`) that don't run in Vercel's serverless functions. `unpdf` is pure JavaScript and serverless-compatible by design.
@@ -231,12 +231,12 @@ Deployed on Vercel, connected to the `main` branch. Vercel's build command is ov
 
 ---
 
-## 📄 License
+##  License
 
 MIT
 
 ---
 
-## 🙋 About
+##  About
 
 Built as a full-stack learning project to explore RAG architecture, dual local/hosted AI inference strategies, and the practical differences between local and serverless deployment environments — from database design through Docker and live production deployment.
