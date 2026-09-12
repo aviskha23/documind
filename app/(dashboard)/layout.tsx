@@ -1,13 +1,19 @@
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Home, FileText, MessageSquare } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserButton } from "@clerk/nextjs";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { userId } = await auth();
+  if (!userId) {
+  redirect("/sign-in");
+}
   return (
     <div className="flex min-h-screen">
       <aside className="w-64 bg-sidebar text-sidebar-foreground p-6">

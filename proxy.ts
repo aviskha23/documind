@@ -2,8 +2,8 @@ import { clerkMiddleware } from "@clerk/nextjs/server";
 
 export default clerkMiddleware({
   frontendApiProxy: {
-    enabled: true,
-  },
+  enabled: (url) => url.hostname === "getdocumind.vercel.app",
+},
 });
 
 export const config = {

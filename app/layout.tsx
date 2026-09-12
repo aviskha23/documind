@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
+import {
+  ClerkProvider,
+  Show,
+  SignInButton,
+  SignUpButton,
+} from "@clerk/nextjs";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
@@ -25,7 +30,9 @@ export const metadata: Metadata = {
   description: "AI-powered document knowledge base",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: LayoutProps<"/">) {
   return (
     <html
       lang="en"
@@ -34,7 +41,27 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <ClerkProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+          >
+            <Show when="signed-out">
+              <header className="flex items-center justify-end gap-3 border-b bg-background px-6 py-4">
+                <SignInButton>
+                  <button className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-muted">
+                    Sign In
+                  </button>
+                </SignInButton>
+
+                <SignUpButton>
+                  <button className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </header>
+            </Show>
+
             {children}
           </ThemeProvider>
         </ClerkProvider>
